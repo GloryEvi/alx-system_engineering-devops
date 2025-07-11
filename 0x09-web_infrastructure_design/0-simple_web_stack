@@ -1,0 +1,38 @@
+# 0-simple_web_stack
+
+## Infrastructure Diagram
+[https://imgur.com/a/ryYXUcs]
+
+## Infrastructure Components Explanation
+
+### What is a server?
+A server is a computer that provides services to other computers. It runs 24/7 to be always available, has resources (CPU, RAM, storage) to handle requests, and responds to requests from client computers like users' browsers.
+
+### What is the role of the domain name?
+The domain name serves as a human-friendly address that points to a server. Instead of users having to remember the IP address (8.8.8.8), they can simply type www.foobar.com to access the website.
+
+### What type of DNS record is `www` in `www.foobar.com`?
+The `www` in `www.foobar.com` is an A record. An A record points directly to an IP address (in this case, www.foobar.com points to 8.8.8.8).
+
+### What is the role of the web server?
+The web server (Nginx) receives HTTP requests from browsers, serves static files (HTML, CSS, JavaScript, images), forwards dynamic requests to the application server, and sends HTTP responses back to browsers.
+
+### What is the role of the application server?
+The application server processes business logic and handles the dynamic parts of the website (like user logins, calculations, data processing). It receives requests from the web server, executes the application code, and sends responses back to the web server.
+
+### What is the role of the database?
+The database (MySQL) stores and retrieves data such as user information, website content, application data, and any other persistent information needed by the website.
+
+### What is the server using to communicate with the computer of the user requesting the website?
+The server uses HTTP/HTTPS protocol over TCP/IP to communicate with the user's computer.
+
+## Infrastructure Issues
+
+### SPOF (Single Point of Failure)
+This infrastructure has a single point of failure because everything runs on one server. If this server fails, crashes, or goes offline, the entire website becomes unavailable to users.
+
+### Downtime when maintenance is needed
+When maintenance is required (like deploying new code or restarting the web server), the website becomes unavailable to users. There's no backup server to handle requests during maintenance periods.
+
+### Cannot scale if too much incoming traffic
+If too many users try to access the website simultaneously, this single server can become overwhelmed and unable to handle all the requests, resulting in slow performance or website crashes. There's no way to distribute the load across multiple servers.
