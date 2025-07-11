@@ -1,0 +1,71 @@
+# 1-distributed_web_infrastructure
+
+## Infrastructure Diagram
+[https://imgur.com/a/Ue7cuNr]
+
+## Infrastructure Components Explanation
+
+### Why we are adding each element:
+
+**2 Additional Servers:**
+We are adding 2 servers to eliminate the single point of failure from the previous design. This provides redundancy and allows load distribution across multiple servers.
+
+**Load Balancer (HAproxy):**
+We are adding a load balancer to distribute incoming requests across multiple servers. This prevents any single server from becoming overwhelmed and improves overall performance and availability.
+
+**Second Application Server:**
+We are adding a second application server to handle more traffic and provide redundancy. If one application server fails, the other can continue serving requests.
+
+### Load Balancer Configuration
+
+**Distribution Algorithm:**
+The load balancer is configured with a **Round Robin** algorithm. This algorithm works by distributing requests sequentially across all available servers. For example, if we have Server 1 and Server 2:
+- 1st request goes to Server 1
+- 2nd request goes to Server 2  
+- 3rd request goes to Server 1
+- 4th request goes to Server 2
+- And so on...
+
+**Active-Active vs Active-Passive Setup:**
+This load balancer enables an **Active-Active** setup.
+
+**Active-Active:** Both servers are actively handling requests simultaneously. The load balancer distributes traffic between both servers, and both are working at the same time.
+
+**Active-Passive:** Only one server (active) handles requests while the other server (passive) stays on standby. The passive server only takes over if the active server fails.
+
+### Database Primary-Replica (Master-Slave) Cluster
+
+**How it works:**
+- The **Primary (Master)** node handles all write operations (INSERT, UPDATE, DELETE)
+- The **Replica (Slave)** node receives a copy of all data from the Primary node
+- The Replica node can handle read operations (SELECT queries)
+- Data synchronization happens automatically from Primary to Replica
+
+**Difference between Primary and Replica nodes:**
+- **Primary node:** Handles both read and write operations. The application sends all data modification requests here.
+- **Replica node:** Handles only read operations. The application can send SELECT queries here to reduce load on the Primary node.
+
+## Infrastructure Issues
+
+### Single Points of Failure (SPOF)
+
+**Load Balancer:** The load balancer itself is a SPOF. If it fails, no traffic can reach the servers.
+
+**Primary Database:** The Primary database is a SPOF for write operations. If it fails, the application cannot write new data or modify existing data.
+
+**Network Connection:** The single network connection to the infrastructure is a SPOF.
+
+### Security Issues
+
+**No Firewall:** There are no firewalls protecting the servers from malicious attacks, unauthorized access, or network threats.
+
+**No HTTPS:** Traffic between users and the infrastructure is not encrypted, making it vulnerable to interception, man-in-the-middle attacks, and data theft.
+
+### No Monitoring
+
+**No Monitoring System:** There is no monitoring system to:
+- Track server performance and health
+- Alert administrators about failures or issues
+- Monitor traffic patterns and resource usage
+- Detect security threats or unusual activity
+- Provide insights for capacity planning
