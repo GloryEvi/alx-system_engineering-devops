@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Configures nginx server with custom 404 page, redirect, and Hello World
+
+# Update package list
+apt-get update -y
+
+# Install nginx
+apt-get install nginx -y
+
+# Create Hello World page
+echo "Hello World!" > /var/www/html/index.html
+
+# Create custom 404 page
+echo "Ceci n'est pas une page" > /var/www/html/404.html
+
+# Create nginx configuration with redirect and custom 404
+tee /etc/nginx/sites-available/default > /dev/null <<EOF
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+    
+    server_name _;
+    
+    error_page 404 /404.html;
+    
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+    
+    location /redirect_me {
+        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+    }
+    
+    location = /404.html {
+        internal;
+    }
+}
+EOF
+
+# Start nginx service
+service nginx start
