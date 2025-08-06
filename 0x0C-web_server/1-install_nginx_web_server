@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Installs and configures nginx web server to serve Hello World page
+
+# Update package list
+apt-get update -y
+
+# Install nginx
+apt-get install nginx -y
+
+# Create Hello World page
+echo "Hello World!" > /var/www/html/index.html
+
+# Start nginx service
+service nginx start
+
+# Enable nginx to start on boot
+service nginx enable
