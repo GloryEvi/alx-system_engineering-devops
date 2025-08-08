@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Configure Nginx with custom HTTP response header
+# The custom header X-Served-By should contain the hostname of the server
+
+# Update package list
+apt-get update -y
+
+# Install Nginx if not already installed
+apt-get install -y nginx
+
+# Get the hostname of the server
+# shellcheck disable=SC2154
+server_hostname=$(hostname)
+
+# Backup the original default site configuration
+cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.backup
+
+# Remove any existing X-Served-By header configuration to avoid duplicates
+sed -i '/add_header X-Served-By/d' /etc/nginx/sites-available/default
+
+# Add the custom header to the server block in the default site
+# This approach is more targeted and reliable
+sed -i "/server_name _;/a\\        add_header X-Served-By $server_hostname;" /etc/nginx/sites-available/default
+
+# If the above doesn't work (server_name line not found), try alternative approach
+if ! grep -q "add_header X-Served-By" /etc/nginx/sites-available/default; then
+    sed -i "/location \/ {/a\\                add_header X-Served-By $server_hostname;" /etc/nginx/sites-available/default
+fi
+
+# Test Nginx configuration
+if nginx -t; then
+    # Restart Nginx to apply changes
+    systemctl restart nginx
+    systemctl enable nginx
+    echo "Nginx configured successfully with X-Served-By header: $server_hostname"
+else
+    echo "Nginx configuration test failed, restoring backup"
+    cp /etc/nginx/sites-available/default.backup /etc/nginx/sites-available/default
+    exit 1
+fi
